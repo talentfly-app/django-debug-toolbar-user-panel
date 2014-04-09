@@ -41,14 +41,6 @@ Add ``debug_toolbar_user_panel.panels.UserPanel`` to ``DEBUG_TOOLBAR_PANELS``::
         'debug_toolbar.panels.logger.LoggingPanel',
     )
 
-Include ``debug_toolbar_user_panel.urls`` somewhere in your ``urls.py``::
-
-    urlpatterns = patterns('',
-        ...
-        url(r'', include('debug_toolbar_user_panel.urls')),
-        ...
-    )
-
 Links
 -----
 
@@ -59,6 +51,7 @@ File a bug
   https://github.com/playfire/django-debug-toolbar-user-panel/issues
 """
 
+from django.conf.urls import patterns, url
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
@@ -94,3 +87,14 @@ class UserPanel(DebugPanel):
 
     def process_response(self, request, response):
         self.request = request
+
+    @classmethod
+    def get_urls(cls):
+        return patterns('debug_toolbar_user_panel.views',
+            url(r'^users/login/$', 'login_form',
+                name='debug-userpanel-login-form'),
+            url(r'^users/login/(?P<pk>-?\d+)$', 'login',
+                name='debug-userpanel-login'),
+            url(r'^users/logout$', 'logout',
+                name='debug-userpanel-logout'),
+        )
