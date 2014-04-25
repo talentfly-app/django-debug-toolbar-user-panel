@@ -41,14 +41,6 @@ Add ``debug_toolbar_user_panel.panels.UserPanel`` to ``DEBUG_TOOLBAR_PANELS``::
         'debug_toolbar.panels.logger.LoggingPanel',
     )
 
-Include ``debug_toolbar_user_panel.urls`` somewhere in your ``urls.py``::
-
-    urlpatterns = patterns('',
-        ...
-        url(r'', include('debug_toolbar_user_panel.urls')),
-        ...
-    )
-
 Links
 -----
 
@@ -59,10 +51,17 @@ File a bug
   https://github.com/playfire/django-debug-toolbar-user-panel/issues
 """
 
+from django.conf import settings
+from django.http import HttpResponseForbidden
+from django.conf.urls import patterns, url
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
+from django.contrib.auth.models import User
+
 from debug_toolbar.panels import DebugPanel
+
+from .forms import UserForm
 
 class UserPanel(DebugPanel):
     """
@@ -72,25 +71,56 @@ class UserPanel(DebugPanel):
     name = 'User'
     has_content = True
 
+    @property
     def nav_title(self):
         return _('User')
 
+    @property
     def url(self):
         return ''
 
+    @property
     def title(self):
         return _('User')
 
+    @property
     def nav_subtitle(self):
         return self.request.user.is_authenticated() and self.request.user
 
-    def content(self):
-        context = self.context.copy()
-        context.update({
-            'request': self.request,
-        })
+    template = 'debug_toolbar_user_panel/panel.html'
 
-        return render_to_string('debug_toolbar_user_panel/panel.html', context)
+    @property
+    def content(self):
+        if not getattr(settings, 'DEBUG_TOOLBAR_USER_DEBUG', settings.DEBUG):
+            return HttpResponseForbidden()
+
+        current = []
+
+        if self.request.user.is_authenticated():
+            for field in User._meta.fields:
+                if field.name == 'password':
+                    continue
+                current.append(
+                    (field.attname, getattr(self.request.user, field.attname))
+                )
+
+        return render_to_string(self.template, {
+            'form': UserForm(),
+            'next': self.request.GET.get('next'),
+            'users': User.objects.order_by('-last_login')[:10],
+            'current': current,
+        })
 
     def process_response(self, request, response):
         self.request = request
+
+    @classmethod
+    def get_urls(cls):
+        return patterns('debug_toolbar_user_panel.views',
+            url(r'^users/login/$', 'login_form',
+                name='debug-userpanel-login-form'),
+            url(r'^users/login/(?P<pk>-?\d+)$', 'login',
+                name='debug-userpanel-login'),
+            url(r'^users/logout$', 'logout',
+                name='debug-userpanel-logout'),
+        )
