@@ -53,15 +53,11 @@ File a bug
 
 from django.conf import settings
 from django.http import HttpResponseForbidden
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
-from django.contrib.auth.models import User
-
 from debug_toolbar.panels import DebugPanel
-
-from .forms import UserForm
 
 class UserPanel(DebugPanel):
     """
@@ -91,6 +87,7 @@ class UserPanel(DebugPanel):
 
     @property
     def content(self):
+        from django.contrib.auth.models import User
         if not getattr(settings, 'DEBUG_TOOLBAR_USER_DEBUG', settings.DEBUG):
             return HttpResponseForbidden()
 
@@ -104,6 +101,8 @@ class UserPanel(DebugPanel):
                     (field.attname, getattr(self.request.user, field.attname))
                 )
 
+        from .forms import UserForm
+
         return render_to_string(self.template, {
             'form': UserForm(),
             'next': self.request.GET.get('next'),
@@ -116,11 +115,12 @@ class UserPanel(DebugPanel):
 
     @classmethod
     def get_urls(cls):
-        return patterns('debug_toolbar_user_panel.views',
-            url(r'^users/login/$', 'login_form',
+        from debug_toolbar_user_panel import views
+        return [
+            url(r'^users/login/$', views.login_form,
                 name='debug-userpanel-login-form'),
-            url(r'^users/login/(?P<pk>-?\d+)$', 'login',
+            url(r'^users/login/(?P<pk>-?\d+)$', views.login,
                 name='debug-userpanel-login'),
-            url(r'^users/logout$', 'logout',
+            url(r'^users/logout$', views.logout,
                 name='debug-userpanel-logout'),
-        )
+        ]
