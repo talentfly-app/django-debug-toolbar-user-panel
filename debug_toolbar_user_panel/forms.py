@@ -1,6 +1,5 @@
-from django.contrib.auth.models import User
-
 from django import forms
+
 
 class UserForm(forms.Form):
     val = forms.CharField(label='User.{id,username,email}')
@@ -12,6 +11,10 @@ class UserForm(forms.Form):
             return {'email': val}
 
         try:
-            return {'pk': int(val)}
+            v = int(val)
+            if len(val) >= 10:
+                return {'username': val}
+            else:
+                return {'pk': v}
         except:
             return {'username': val}
