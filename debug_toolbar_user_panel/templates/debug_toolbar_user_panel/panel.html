@@ -1,13 +1,9 @@
 <h4>Current user</h4>
 
-{% if user.is_authenticated %}
-  <table>
-    <tr>{% for x,y in current %}<th>{{ x }}</th>{% endfor %}</tr>
-    <tr>{% for x,y in current %}<td>{{ y }}</td>{% endfor %}</tr>
-  </table>
-{% else %}
-  <p>Not logged in.</p>
-{% endif %}
+<table>
+  <tr>{% for x,y in current %}<th>{{ x }}</th>{% endfor %}</tr>
+  <tr>{% for x,y in current %}<td>{{ y }}</td>{% endfor %}</tr>
+</table>
 
 <h4>Recent users</h4>
 
