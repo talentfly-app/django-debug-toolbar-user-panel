@@ -87,14 +87,14 @@ class UserPanel(DebugPanel):
 
     @property
     def content(self):
-        from django.contrib.auth.models import User
+        from django.contrib.auth import get_user_model
         if not getattr(settings, 'DEBUG_TOOLBAR_USER_DEBUG', settings.DEBUG):
             return HttpResponseForbidden()
 
         current = []
 
         if self.request.user.is_authenticated():
-            for field in User._meta.fields:
+            for field in get_user_model()._meta.fields:
                 if field.name == 'password':
                     continue
                 current.append(
@@ -106,7 +106,7 @@ class UserPanel(DebugPanel):
         return render_to_string(self.template, {
             'form': UserForm(),
             'next': self.request.GET.get('next'),
-            'users': User.objects.order_by('-last_login')[:10],
+            'users': get_user_model().objects.order_by('-last_login')[:10],
             'current': current,
         })
 

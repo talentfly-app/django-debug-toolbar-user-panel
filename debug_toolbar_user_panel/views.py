@@ -24,8 +24,8 @@ def login_form(request):
 @require_POST
 @debug_required
 def login(request, **kwargs):
-    from django.contrib.auth.models import User
-    user = get_object_or_404(User, **kwargs)
+    from django.contrib.auth import get_user_model
+    user = get_object_or_404(get_user_model(), **kwargs)
 
     user.backend = settings.AUTHENTICATION_BACKENDS[0]
     auth.login(request, user)
