@@ -81,7 +81,7 @@ class UserPanel(DebugPanel):
 
     @property
     def nav_subtitle(self):
-        return self.request.user.is_authenticated() and self.request.user
+        return self.request.user.is_authenticated and self.request.user
 
     template = 'debug_toolbar_user_panel/panel.html'
 
@@ -93,7 +93,7 @@ class UserPanel(DebugPanel):
 
         current = []
 
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             for field in get_user_model()._meta.fields:
                 if field.name == 'password':
                     continue
