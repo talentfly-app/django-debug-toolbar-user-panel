@@ -53,11 +53,12 @@ File a bug
 
 from django.conf import settings
 from django.http import HttpResponseForbidden
-from django.conf.urls import url
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _
+from django.urls import re_path
+from django.utils.translation import gettext_lazy as _
 
 from debug_toolbar.panels import Panel
+
 
 class UserPanel(Panel):
     """
@@ -117,10 +118,7 @@ class UserPanel(Panel):
     def get_urls(cls):
         from debug_toolbar_user_panel import views
         return [
-            url(r'^users/login/$', views.login_form,
-                name='debug-userpanel-login-form'),
-            url(r'^users/login/(?P<pk>-?\d+)$', views.login,
-                name='debug-userpanel-login'),
-            url(r'^users/logout$', views.logout,
-                name='debug-userpanel-logout'),
+            re_path(r'^users/login/$', views.login_form, name='debug_userpanel_login_form'),
+            re_path(r'^users/login/(?P<pk>-?\d+)$', views.login, name='debug_userpanel_login'),
+            re_path(r'^users/logout$', views.logout, name='debug_userpanel_logout'),
         ]

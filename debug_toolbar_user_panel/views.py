@@ -20,6 +20,7 @@ def login_form(request):
 
     return login(request, **form.get_lookup())
 
+
 @csrf_exempt
 @require_POST
 @debug_required
@@ -31,6 +32,7 @@ def login(request, **kwargs):
     auth.login(request, user)
 
     return HttpResponseRedirect(request.POST.get('next', '/'))
+
 
 @csrf_exempt
 @require_POST

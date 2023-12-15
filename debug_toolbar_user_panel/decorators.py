@@ -3,6 +3,7 @@ import functools
 from django.conf import settings
 from django.http import HttpResponseForbidden
 
+
 def debug_required(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):

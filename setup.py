@@ -6,7 +6,7 @@ setup(
     name='django-debug-toolbar-user-panel',
     description="Panel for the Django Debug toolbar to quickly switch between "
         "users.",
-    version='0.1',
+    version='0.2',
     url='http://code.playfire.com/',
 
     author='Playfire.com',
